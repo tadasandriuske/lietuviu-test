@@ -47,34 +47,30 @@
   <div class="container">
     <!-- First row: Left column empty, Right column with item -->
     <div class="row">
-
       <div class="col-12 col-md-6">
-      <div id="options-field-div" class="col-12">
-        <div id="options-field" class="field">
+        <div id="options-field-div" class="col-12">
+          <div id="options-field" class="field">
+          </div>
         </div>
       </div>
-    </div>
 
-  
-  
-    <!-- Second row: Draggable items and Bottom right -->
-
+      <!-- Second row: Draggable items and Bottom right -->
       <!-- Left column with draggable items -->
-       <div class="col-12 col-md-6">
-      <div class="col-12">
-        <div id="title-field" class="field">
-          Pavadinimas
+      <div class="col-12 col-md-6">
+        <div class="col-12">
+          <div id="title-field" class="field">
+            Pavadinimas
+          </div>
         </div>
-      </div>
-  
-      <!-- Right column with bottom-right item -->
-      <div id="answers-field-div" class="col-12">
-        <div id="answers-field" class="field">
-          Tekstas
+    
+        <!-- Right column with bottom-right item -->
+        <div id="answers-field-div" class="col-12">
+          <div id="answers-field" class="field">
+            Tekstas
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
     <!-- Check answer button -->
     <div class="row">
@@ -82,7 +78,7 @@
         <button id="check-answer-btn" class="btn btn-primary">Check Answer</button>
         <div id="result-message"></div>
       </div>
-
+    </div>
   </div>
 
   <!-- Include Bootstrap JS -->
@@ -91,6 +87,11 @@
   <script src="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.js"></script>
 
   <script>
+    // Prevent the default touchmove behavior to avoid Chrome's refresh gesture
+    document.addEventListener('touchmove', function (event) {
+      event.preventDefault();
+    }, { passive: false });
+
     // Paragraph library with title and paragraph pairs
     const paragraphLibrary = [
       {
