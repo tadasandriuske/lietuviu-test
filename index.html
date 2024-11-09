@@ -49,20 +49,18 @@
     <div class="row">
       <div class="col-12 col-md-6">
         <div id="options-field-div" class="col-12">
-          <div id="options-field" class="field">
-          </div>
+          <div id="options-field" class="field"></div>
         </div>
       </div>
 
       <!-- Second row: Draggable items and Bottom right -->
-      <!-- Left column with draggable items -->
       <div class="col-12 col-md-6">
         <div class="col-12">
           <div id="title-field" class="field">
             Pavadinimas
           </div>
         </div>
-    
+
         <!-- Right column with bottom-right item -->
         <div id="answers-field-div" class="col-12">
           <div id="answers-field" class="field">
@@ -87,11 +85,6 @@
   <script src="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.js"></script>
 
   <script>
-    // Prevent the default touchmove behavior to avoid Chrome's refresh gesture
-    document.addEventListener('touchmove', function (event) {
-      event.preventDefault();
-    }, { passive: false });
-
     // Paragraph library with title and paragraph pairs
     const paragraphLibrary = [
       {
@@ -145,10 +138,56 @@
     dragula([document.getElementById('options-field'), document.getElementById('title-field'), document.getElementById('answers-field')])
       .on('drag', function (el) {
         console.log("Dragging:", el.textContent);
+
+        // Disable touch scrolling while dragging
+        if (window.ontouchstart !== undefined) {
+          document.body.style.overflow = 'hidden'; // Disable body scroll
+        }
+      })
+      .on('dragend', function (el) {
+        console.log("Drag ended:", el.textContent);
+
+        // Re-enable scrolling when drag ends
+        if (window.ontouchstart !== undefined) {
+          document.body.style.overflow = ''; // Re-enable body scroll
+        }
       })
       .on('drop', function (el, target) {
         console.log("Dropped:", el.textContent, "into", target.id);
       });
+
+    // Add touch event listener for scroll behavior on mobile
+    let dragStartY = 0;
+    let isDragging = false;
+
+    document.addEventListener('touchstart', function (event) {
+      if (event.target.classList.contains('item')) {
+        dragStartY = event.touches[0].clientY;
+        isDragging = true;
+      }
+    });
+
+    document.addEventListener('touchmove', function (event) {
+      if (isDragging) {
+        const dragEl = document.querySelector('.gu-transit');
+        const screenHeight = window.innerHeight;
+        const dragY = event.touches[0].clientY;
+
+        // Check if we are near the top or bottom of the screen
+        if (dragY < 50) {
+          window.scrollBy(0, -10); // Scroll up when near top
+        } else if (dragY > screenHeight - 50) {
+          window.scrollBy(0, 10); // Scroll down when near bottom
+        }
+
+        // Prevent default scrolling behavior
+        event.preventDefault();
+      }
+    });
+
+    document.addEventListener('touchend', function () {
+      isDragging = false;
+    });
 
     // Button event to check the answer
     document.getElementById('check-answer-btn').addEventListener('click', function () {
