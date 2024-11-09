@@ -157,30 +157,30 @@
       });
 
     // Add touch event listener for scroll behavior on mobile
-    let dragStartY = 0;
     let isDragging = false;
+    let dragStartY = 0;
 
     document.addEventListener('touchstart', function (event) {
       if (event.target.classList.contains('item')) {
         dragStartY = event.touches[0].clientY;
         isDragging = true;
+        event.preventDefault(); // Prevent initial scrolling
       }
     });
 
     document.addEventListener('touchmove', function (event) {
       if (isDragging) {
-        const dragEl = document.querySelector('.gu-transit');
-        const screenHeight = window.innerHeight;
         const dragY = event.touches[0].clientY;
+        const screenHeight = window.innerHeight;
 
-        // Check if we are near the top or bottom of the screen
+        // Allow scrolling only near the top or bottom
         if (dragY < 50) {
           window.scrollBy(0, -10); // Scroll up when near top
         } else if (dragY > screenHeight - 50) {
           window.scrollBy(0, 10); // Scroll down when near bottom
         }
 
-        // Prevent default behavior of the browser (pull-to-refresh, page scroll, etc.)
+        // Prevent default behavior (page refresh, scrolling) until we are near edges
         event.preventDefault();
       }
     });
@@ -214,20 +214,11 @@
       }
 
       // The correct answer should include the title as the first item, followed by the sentences in order
-      const sentencesCorrect = arraysAreEqual(answerList, sentences); // Compare full answer (title + sentences)
-
-      // Check if the title length and content matches the original title
-      const titleCorrect = titleList.length === 1 && titleList[0] === originalTitle;
-
-      // If both title and sentences are correct
-      if (sentencesCorrect && titleCorrect) {
-        resultMessage.textContent = "Correct!";
-        resultMessage.style.color = 'green';
-      } else {
-        resultMessage.textContent = "Wrong!";
-        resultMessage.style.color = 'red';
-      }
+      const sentencesCorrect = arraysAreEqual(answerList, sentences); // Compare sentences
+      resultMessage.textContent = sentencesCorrect ? 'Correct!' : 'Incorrect!';
     });
+
   </script>
+
 </body>
 </html>
