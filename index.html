@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dragula Example with Bootstrap</title>
+
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Include Dragula CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.css" rel="stylesheet">
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          padding: 20px;
+        }
+
+        .field {
+          background-color: #e0e0e0;
+          padding: 10px;
+          margin: 10px;
+          width: 100%;
+        }
+
+        .item {
+          padding: 10px;
+          margin: 5px;
+          background-color: #e0e0e0;
+          cursor: move;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+        }
+
+        /* Ensure the drop targets fill the column */
+        #options-field, #answers-field {
+            min-height: 500px;
+        }
+
+        #result-message {
+          margin-top: 20px;
+          font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- First row: Left column empty, Right column with item -->
+    <div class="row">
+      <div class="col-6">
+      </div>
+      <div class="col-6">
+        <div id="title-field" class="field">
+        </div>
+      </div>
+    </div>
+  
+    <!-- Second row: Draggable items and Bottom right -->
+    <div class="row">
+      <!-- Left column with draggable items -->
+      <div id="options-field-div" class="col-6">
+        <div id="options-field" class="field">
+        </div>
+      </div>
+  
+      <!-- Right column with bottom-right item -->
+      <div id="answers-field-div" class="col-6">
+        <div id="answers-field" class="field">
+        </div>
+      </div>
+    </div>
+  
+    <!-- Check answer button -->
+    <div class="row">
+      <div class="col-12">
+        <button id="check-answer-btn" class="btn btn-primary">Check Answer</button>
+        <div id="result-message"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0r3ry7kAop5z3XMJ4g/4dWl56h3xW00tiy8b6Bc5tbtiq5x7" crossorigin="anonymous"></script>
+  <!-- Include Dragula JS -->
+  <script src="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.js"></script>
+
+  <script>
+    // Paragraph library with title and paragraph pairs
+    const paragraphLibrary = [
+      {
+        title: "Sample Title 1",
+        paragraph: "A. B. C. D."
+      },
+      {
+        title: "Sample Title 2",
+        paragraph: "This is the second example paragraph. It also contains several sentences. The user needs to drag and drop the sentences into the correct order. The title is included at the top."
+      }
+    ];
+
+    // Function to split a paragraph into sentences
+    function splitParagraphToSentences(paragraph) {
+      return paragraph.split(/(?<=\.)\s+/); // Split by period followed by space
+    }
+
+    // Function to shuffle the array of sentences
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+      }
+      return array;
+    }
+
+    // Select a random item from the library
+    const selectedItem = paragraphLibrary[0];
+    const originalTitle = selectedItem.title;
+    const originalParagraph = selectedItem.paragraph;
+
+    // Split the paragraph into sentences
+    const sentences = splitParagraphToSentences(originalParagraph);
+
+    // Combine the title and sentences into one array
+    const combinedItems = [originalTitle, ...sentences];
+
+    // Shuffle the combined items (title + sentences)
+    const shuffledItems = shuffleArray(combinedItems);
+
+    // Append shuffled items (title + sentences) as draggable items
+    const optionsField = document.getElementById('options-field');
+    shuffledItems.forEach(item => {
+      const itemDiv = document.createElement('div');
+      itemDiv.classList.add('item');
+      itemDiv.textContent = item;
+      optionsField.appendChild(itemDiv);
+    });
+
+    // Initialize Dragula with the correct containers
+    dragula([document.getElementById('options-field'), document.getElementById('title-field'), document.getElementById('answers-field')])
+      .on('drag', function (el) {
+        console.log("Dragging:", el.textContent);
+      })
+      .on('drop', function (el, target) {
+        console.log("Dropped:", el.textContent, "into", target.id);
+      });
+
+    // Button event to check the answer
+    document.getElementById('check-answer-btn').addEventListener('click', function () {
+      // Get the order of items in the answers field
+      const answersField = document.getElementById('answers-field');
+      const answerItems = answersField.querySelectorAll('.item');
+      const answerList = Array.from(answerItems).map(item => item.textContent);
+
+      // Get the title from the title field
+      const titleField = document.getElementById('title-field');
+      const titleItems = titleField.querySelectorAll('.item');
+      const titleList = Array.from(titleItems).map(item => item.textContent);
+
+      // Check if the order of items in the answers field matches the original order (including title)
+      const resultMessage = document.getElementById('result-message');
+
+      // Check if the title and sentences in the answers field match the original order
+      function arraysAreEqual(arr1, arr2) {
+        if (arr1.length !== arr2.length) return false; // If lengths don't match, arrays are not equal
+        for (let i = 0; i < arr1.length; i++) {
+          if (arr1[i].trim() !== arr2[i].trim()) return false; // Trim each item and compare
+        }
+        return true; // If all elements match, arrays are equal
+      }
+
+      // The correct answer should include the title as the first item, followed by the sentences in order
+      const sentencesCorrect = arraysAreEqual(answerList, sentences); // Compare full answer (title + sentences)
+
+      // Check if the title length and content matches the original title
+      const titleCorrect = titleList.length === 1 && titleList[0] === originalTitle;
+
+      // If both title and sentences are correct
+      if (sentencesCorrect && titleCorrect) {
+        resultMessage.textContent = "Correct!";
+        resultMessage.style.color = 'green';
+      } else {
+        resultMessage.textContent = "Wrong!";
+        resultMessage.style.color = 'red';
+      }
+    });
+  </script>
+</body>
+</html>
