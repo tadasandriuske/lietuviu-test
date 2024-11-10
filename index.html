@@ -89,7 +89,7 @@
     const paragraphLibrary = [
       {
         title: "Sample Title 1",
-        paragraph: "A. B. C. D."
+        paragraph: "This is the second example paragraph. It also contains several sentences. The user needs to drag and drop the sentences into the correct order. The title is included at the top."
       },
       {
         title: "Sample Title 2",
@@ -159,25 +159,16 @@
     // Add touch event listener for scroll behavior on mobile
     let isDragging = false;
     let dragStartY = 0;
-    let touchStartTime = 0;
-    const LONG_PRESS_DELAY = 500; // Delay before enabling drag (in ms)
 
     document.addEventListener('touchstart', function (event) {
       if (event.target.classList.contains('item')) {
+        event.preventDefault(); // Prevent initial scrolling right away
         dragStartY = event.touches[0].clientY;
-        touchStartTime = Date.now();
-        isDragging = false;
-        event.preventDefault(); // Prevent initial scrolling
+        isDragging = true;
       }
     });
 
     document.addEventListener('touchmove', function (event) {
-      if (!isDragging && Date.now() - touchStartTime >= LONG_PRESS_DELAY) {
-        isDragging = true;
-        event.preventDefault(); // Allow drag to start only after long press
-        document.body.style.overflow = 'hidden'; // Disable body scrolling during drag
-      }
-
       if (isDragging) {
         const dragY = event.touches[0].clientY;
         const screenHeight = window.innerHeight;
@@ -189,15 +180,13 @@
           window.scrollBy(0, 10); // Scroll down when near bottom
         }
 
-        // Prevent default behavior (page refresh, scrolling) until drag is initiated
+        // Prevent default behavior (page refresh, scrolling) until we are near edges
         event.preventDefault();
       }
     });
 
     document.addEventListener('touchend', function () {
-      if (isDragging) {
-        document.body.style.overflow = ''; // Re-enable body scroll after dragging ends
-      }
+      isDragging = false;
     });
 
     // Button event to check the answer
@@ -228,6 +217,7 @@
       const sentencesCorrect = arraysAreEqual(answerList, sentences); // Compare sentences
       resultMessage.textContent = sentencesCorrect ? 'Correct!' : 'Incorrect!';
     });
+
   </script>
 
 </body>
