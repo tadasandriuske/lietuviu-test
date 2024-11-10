@@ -161,29 +161,27 @@
     let dragStartY = 0;
 
     document.addEventListener('touchstart', function (event) {
-      if (event.target.classList.contains('item')) {
-        event.preventDefault(); // Prevent initial scrolling right away
-        dragStartY = event.touches[0].clientY;
-        isDragging = true;
-      }
-    });
+  if (event.target.classList.contains('item')) {
+    event.preventDefault(); // Prevent scroll from starting
+    dragStartY = event.touches[0].clientY;
+    isDragging = true;
+  }
+}, { passive: false });
 
-    document.addEventListener('touchmove', function (event) {
-      if (isDragging) {
-        const dragY = event.touches[0].clientY;
-        const screenHeight = window.innerHeight;
+document.addEventListener('touchmove', function (event) {
+  if (isDragging) {
+    event.preventDefault(); // Ensure scroll remains disabled
+    const dragY = event.touches[0].clientY;
+    const screenHeight = window.innerHeight;
 
-        // Allow scrolling only near the top or bottom
-        if (dragY < 50) {
-          window.scrollBy(0, -10); // Scroll up when near top
-        } else if (dragY > screenHeight - 50) {
-          window.scrollBy(0, 10); // Scroll down when near bottom
-        }
-
-        // Prevent default behavior (page refresh, scrolling) until we are near edges
-        event.preventDefault();
-      }
-    });
+    // Only scroll near edges
+    if (dragY < 50) {
+      window.scrollBy(0, -10);
+    } else if (dragY > screenHeight - 50) {
+      window.scrollBy(0, 10);
+    }
+  }
+}, { passive: false });
 
     document.addEventListener('touchend', function () {
       isDragging = false;
